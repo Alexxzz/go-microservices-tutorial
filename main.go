@@ -14,12 +14,10 @@ import (
 func main() {
 	logger := log.New(os.Stdout, "product-api", log.LstdFlags)
 
-	helloHandler := handlers.NewHello(logger)
-	goodbyeHandler := handlers.NewGoodbye(logger)
+	productsHandler := handlers.NewProducts(logger)
 
 	sm := http.NewServeMux()
-	sm.Handle("/", helloHandler)
-	sm.Handle("/goodbye", goodbyeHandler)
+	sm.Handle("/", productsHandler)
 
 	s := &http.Server{
 		Addr:         ":9090",
@@ -29,12 +27,13 @@ func main() {
 		WriteTimeout: 1 * time.Second,
 	}
 
-	go func() {
+	f := func() {
 		err := s.ListenAndServe()
 		if err != nil {
 			logger.Fatal(err)
 		}
-	}()
+	}
+	go f()
 
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt)
