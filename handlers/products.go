@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"github.com/Alexxzz/go-microservices-tutorial/data"
 	"github.com/gorilla/mux"
 	"log"
@@ -61,12 +62,22 @@ const productContextKey contextKey = "__ProductContextKey"
 
 func (p Products) MiddlewareProductValidation(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		p.logger.Println("In the MIDDLEWARE!!!")
-
 		prod := &data.Product{}
 		err := prod.FromJSON(r.Body)
 		if err != nil {
+			p.logger.Println("[ERROR] deserializing product", err)
 			http.Error(rw, "Unable to unmarshall JSON", http.StatusBadRequest)
+			return
+		}
+
+		err = prod.Validate()
+		if err != nil {
+			p.logger.Println("[ERROR] validating product", err)
+			http.Error(
+				rw,
+				fmt.Sprintf("Unable to validate product: %s", err),
+				http.StatusBadRequest,
+			)
 			return
 		}
 
