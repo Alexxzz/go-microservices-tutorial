@@ -1,3 +1,18 @@
+// Package handlers
+// Package classification of Product API
+//
+// Documentation for Product API
+//
+//	Schemes: http
+//	BasePath: /
+//	Version: 1.0.0
+//
+//	Consumes:
+//	- application/json
+//
+//	Produces:
+//	- application/json
+// swagger:meta
 package handlers
 
 import (
@@ -10,24 +25,20 @@ import (
 	"strconv"
 )
 
+// A list of products in the response
+// swagger:response productsResponse
+type productsResponse struct {
+	// All products in the system
+	// in: body
+	Body []data.Product
+}
+
 type Products struct {
 	logger *log.Logger
 }
 
 func NewProducts(logger *log.Logger) *Products {
 	return &Products{logger}
-}
-
-func (p *Products) GetProducts(w http.ResponseWriter, r *http.Request) {
-	p.logger.Println("Handle GET Products")
-
-	lp := data.GetProducts()
-
-	err := lp.ToJSON(w)
-
-	if err != nil {
-		http.Error(w, "Unable to marshal json", http.StatusInternalServerError)
-	}
 }
 
 func (p *Products) AddProduct(w http.ResponseWriter, r *http.Request) {

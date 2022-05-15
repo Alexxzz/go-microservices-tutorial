@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -29,6 +30,13 @@ func main() {
 	postRoute := sm.Methods(http.MethodPost).Subrouter()
 	postRoute.HandleFunc("/", productsHandler.AddProduct)
 	postRoute.Use(productsHandler.MiddlewareProductValidation)
+
+	opts := middleware.RedocOpts{
+		SpecURL: "/swagger.yaml",
+	}
+	sh := middleware.Redoc(opts, nil)
+	getRouter.Handle("/docs", sh)
+	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
 
 	s := &http.Server{
 		Addr:         ":9090",
